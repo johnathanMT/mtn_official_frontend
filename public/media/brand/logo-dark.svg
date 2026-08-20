@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" width="200" height="48" role="img" aria-label="Myo Thant Naing">
+  <g fill="none" stroke="#152526" stroke-width="1.6">
+    <path d="M4 34V14l9 13 9-13v20"/>
+  </g>
+  <text x="30" y="31" font-family="Georgia,'Times New Roman',serif" font-size="17"
+        letter-spacing="2.6" fill="#152526">MYO THANT NAING</text>
+</svg>
