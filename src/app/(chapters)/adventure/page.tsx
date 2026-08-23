@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import ChapterHero from "@/components/chapter/ChapterHero";
-import { MEDIA, getGallery } from "@/config/mediaControl";
+import AdventureHero from "@/components/chapter/AdventureHero";
+import { getGallery } from "@/config/mediaControl";
 import { getChapter } from "@/config/navigation";
 
 /* Route config lives in src/config/navigation.ts — label, blurb and cover
@@ -25,12 +25,10 @@ export default function AdventurePage() {
 
   return (
     <main id="main">
-      <ChapterHero
-        eyebrow="Chapter 01"
-        title="Adventure"
-        blurb={CHAPTER.blurb}
-        cover={MEDIA.chapters.adventure}
-      />
+      {/* The cinematic hero owns its own copy now — it reads the blurb and the
+          chapter number straight from navigation.ts, so nothing is passed in
+          and nothing can fall out of sync with the nav. */}
+      <AdventureHero />
 
       {/* ---- Gallery goes here. Scaffold only for now. ---- */}
       <section className="container-premium py-20 lg:py-28">

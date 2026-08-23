@@ -85,6 +85,7 @@ import {
   cloudinaryVideoPoster,
   cloudinaryVideoUrl,
 } from "@/config/mediaControl";
+import { chapterEyebrow } from "@/config/navigation";
 
 /* ---------------------------------------------------------------------------
  * MEDIA
@@ -199,13 +200,19 @@ const ALT = {
  * is edited, and a third language later is a third key here rather than a
  * third object to keep aligned.
  *
- * Note the Myanmar digits in the kicker — ၀၄, not 04. Latin numerals dropped
- * into an otherwise Burmese line are the small tell that a translation was
- * machine-produced and never read by a person.
+ * The kicker's NUMBER is no longer typed here. It said "Chapter 04" while the
+ * mobile nav said 05, because the nav numbers by NAV_LINKS order and this file
+ * numbered by hand. Both now read `chapterEyebrow("/fortune")`, so they cannot
+ * disagree again. The Myanmar digits (၀၅, not 05) come from the same helper —
+ * Latin numerals dropped into an otherwise Burmese line are the small tell
+ * that a translation was machine-produced and never read by a person.
  * ------------------------------------------------------------------------ */
 
 const COPY = {
-  kicker: { en: "— Chapter 04 —", my: "— အခန်း ၀၄ —" },
+  kicker: {
+    en: `— ${chapterEyebrow("/fortune").en} —`,
+    my: `— ${chapterEyebrow("/fortune").my} —`,
+  },
 
   title: { en: "Fortune", my: "ကံကြမ္မာ" },
 

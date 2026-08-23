@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import ChapterHero from "@/components/chapter/ChapterHero";
 import { MEDIA } from "@/config/mediaControl";
-import { getChapter } from "@/config/navigation";
+import { chapterEyebrow, getChapter } from "@/config/navigation";
 
 /* Route config lives in src/config/navigation.ts — label, blurb and cover
    image all resolve from there, so this file stays almost empty.
@@ -24,7 +24,7 @@ export default function AboutPage() {
   return (
     <main id="main">
       <ChapterHero
-        eyebrow="The person"
+        eyebrow={chapterEyebrow("/about").en}
         title="About me"
         blurb={CHAPTER.blurb}
         cover={MEDIA.chapters.about}

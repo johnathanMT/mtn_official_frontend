@@ -37,6 +37,7 @@ import {
 } from "motion/react";
 import {
   BRAND,
+  getChapterNumber,
   hasDarkHero,
   NAV_CTA,
   NAV_GLASS_THRESHOLD,
@@ -283,7 +284,7 @@ export default function Navbar() {
           >
             <nav aria-label="Mobile" className="container-premium">
               <ul className="flex flex-col gap-1">
-                {NAV_LINKS.map((link, i) => (
+                {NAV_LINKS.map((link) => (
                   <motion.li key={link.href} variants={panelItem}>
                     <Link
                       href={link.href}
@@ -292,7 +293,7 @@ export default function Navbar() {
                       className="text-primary group flex items-baseline gap-4 py-2.5"
                     >
                       <span className="text-accent-300 font-mono text-xs">
-                        0{i + 1}
+                        {getChapterNumber(link.href).en}
                       </span>
                       <span
                         className={`font-display text-4xl leading-tight font-medium transition-transform duration-300 group-hover:translate-x-1 ${

@@ -36,7 +36,8 @@ export const NAV_LINKS: NavLink[] = [
     label: "About me",
     href: "/about",
     chapter: "about",
-    blurb: "The person behind the chapters — engineering, image, and the long road between them.",
+    blurb:
+      "The person behind the chapters — engineering, image, and the long road between them.",
   },
   {
     label: "Adventure",
@@ -124,4 +125,59 @@ export function hasDarkHero(pathname: string): boolean {
 /** Look up a chapter's config by route — used by each page.tsx. */
 export function getChapter(href: string): NavLink | undefined {
   return NAV_LINKS.find((l) => l.href === href);
+}
+
+/* ---------------------------------------------------------------------------
+ * CHAPTER NUMBERS
+ *
+ * THESE EXIST BECAUSE THE NUMBERS HAD ALREADY DRIFTED, AND NOT ONLY ON
+ * FORTUNE. The mobile nav derives its numbering from this array's ORDER, but
+ * every hero typed its own number as a literal in a different file, and all
+ * five were wrong:
+ *
+ *     route        nav (by order)   hero said       hero says now
+ *     /about             01         "The person"    Chapter 01
+ *     /adventure         02         Chapter 01      Chapter 02
+ *     /art               03         Chapter 02      Chapter 03
+ *     /tech              04         Chapter 03      Chapter 04
+ *     /fortune           05         Chapter 04      Chapter 05
+ *
+ * About was never numbered at all, so the other four were each running exactly
+ * one behind the nav. Renumbering five strings would have fixed today and
+ * guaranteed tomorrow: insert a sixth chapter anywhere but the end and they
+ * drift again. The number is now DERIVED from this array in both places, so
+ * reordering NAV_LINKS renumbers the nav and every hero together.
+ * ------------------------------------------------------------------------ */
+
+/** Myanmar digits, U+1040 to U+1049, indexed by their Latin value. */
+const MYANMAR_DIGITS = "၀၁၂၃၄၅၆၇၈၉";
+
+/**
+ * "05" -> "၀၅". Character by character, so it is safe on any numeric string
+ * and leaves everything that is not a digit alone.
+ */
+export function toMyanmarDigits(value: number | string): string {
+  return String(value).replace(/[0-9]/g, (d) => MYANMAR_DIGITS[Number(d)]);
+}
+
+/**
+ * A chapter's position in NAV_LINKS, zero-padded, in both scripts.
+ *
+ * padStart rather than the `0${i + 1}` template the navbar used to carry —
+ * that one prints "010" at ten chapters. Unlikely, but the entire point of
+ * this block is that nobody has to remember.
+ *
+ * An unknown href yields "00" rather than throwing: a hero with a typo in its
+ * route should render something obviously wrong, not take the page down.
+ */
+export function getChapterNumber(href: string): { en: string; my: string } {
+  const index = NAV_LINKS.findIndex((l) => l.href === href);
+  const en = String(index + 1).padStart(2, "0");
+  return { en, my: toMyanmarDigits(en) };
+}
+
+/** The whole eyebrow, e.g. { en: "Chapter 05", my: "အခန်း ၀၅" }. */
+export function chapterEyebrow(href: string): { en: string; my: string } {
+  const n = getChapterNumber(href);
+  return { en: `Chapter ${n.en}`, my: `အခန်း ${n.my}` };
 }
