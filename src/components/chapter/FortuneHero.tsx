@@ -102,21 +102,93 @@ const MEDIA = {
      it is a plain string, so it survives the Server → Client boundary that a
      loader function would not.
 
-     c_fill + g_auto instead of the default c_limit: each still fills a half-
+     c_fill + g_auto instead of the default c_limit: the still fills a half-
      screen panel, and g_auto lets Cloudinary pick the crop around the subject
      rather than the geometric centre. Without an `ar_`, c_fill has no target
      shape and quietly behaves like a plain scale. */
   stillTop: "v1787476970/IMG_3327_jfkxuj.heic#c_fill,g_auto,ar_16:10",
-  stillBottom:
-    "v1787477345/runic_sheet_roll_roseviolent_bsy58k.heic#c_fill,g_auto,ar_16:10",
+
+  /* ---------------------------------------------------------------------
+     NO `#…` SUFFIX ON THIS ONE, AND THAT IS THE WHOLE POINT OF THE CHANGE.
+     ---------------------------------------------------------------------
+     The old asset carried `#c_fill,g_auto,ar_16:10`, which crops on
+     Cloudinary's side BEFORE the file reaches the browser. Then
+     `object-cover` crops it a second time in CSS. Two crops compound, and
+     the second one has no idea what the first threw away — if your subject
+     sits anywhere but dead centre, `ar_16:10` can already have taken it off
+     before `object-position` gets a vote.
+
+     That would have been a fair trade if 16:10 matched the panel. It does
+     not. I measured the rendered panel at five viewports:
+
+         viewport        still panel        panel aspect
+         320 x 720       160 x 360          0.444
+         390 x 844       195 x 422          0.462     ← phones
+         768 x 1024      384 x 512          0.750
+         1024 x 768      512 x 384          1.333
+         1440 x  900     720 x 450          1.600     ← laptops
+
+     The panel's aspect ratio is always the VIEWPORT's aspect ratio — below
+     md the stills are half the width and half the height, above md they are
+     half of each as well. So it swings 3.6x between a phone held upright and
+     a laptop, and `ar_16:10` is correct at exactly one of those. On a 390px
+     phone, Cloudinary delivered 1.6 and CSS then had to fit it into 0.462,
+     which keeps 0.462/1.6 = 29% of the width and discards the other 71% —
+     on top of whatever g_auto had already trimmed.
+
+     Dropping the suffix means the loader's default `c_limit` applies, and
+     c_limit only ever scales down; it never removes pixels. The whole frame
+     arrives and there is exactly ONE crop, in CSS, steered by the single
+     constant below.
+
+     f_auto,q_auto are untouched by this — the loader emits them for every
+     asset unconditionally, which is what converts the .heic to WebP/AVIF. */
+  stillBottom: "v1787477348/nawarat_beats_varja_la6fm8.heic",
 } as const;
+
+/* ---------------------------------------------------------------------------
+ * FOCAL POINT — the one line to tune
+ *
+ * BE CLEAR ABOUT WHAT object-cover CAN AND CANNOT PROMISE. It fills the panel
+ * and crops the overflow; there is no value of object-position that makes an
+ * entire image visible inside a box of a different shape. Only `object-contain`
+ * can do that, and it letterboxes — see the escape hatch at the <Image> below.
+ * What object-position does is choose WHICH part survives, and on this layout
+ * that is worth getting right, because the surviving strip is 29% of the width
+ * on a phone.
+ *
+ * 50% horizontally, 40% vertically is your suggested starting value and a sane
+ * default: centred left-to-right, biased slightly above centre vertically,
+ * which is where a subject's head or the visual weight of an object usually
+ * sits. I could not verify it — res.cloudinary.com is not reachable from this
+ * sandbox, so I have not seen nawarat_beats_varja. Treat 40% as a placeholder,
+ * not a measurement.
+ *
+ * TO TUNE IT IN ABOUT A MINUTE: open the image on its own, read off roughly
+ * where the centre of the subject falls as a percentage of the full frame, and
+ * put those two numbers here. Left edge is 0%, right edge 100%; top 0%, bottom
+ * 100%. If the subject sits in the upper third, `object-[50%_30%]`. If it is
+ * off to the left, `object-[35%_40%]`.
+ *
+ * Remember which axis actually bites at which size: on a phone the panel is
+ * TALLER than it is wide, so the vertical number does almost nothing and the
+ * horizontal number decides everything. On a laptop it is the reverse. If one
+ * value cannot serve both, this accepts a responsive pair, e.g.
+ *
+ *     "object-[38%_50%] md:object-[50%_35%]"
+ * ------------------------------------------------------------------------ */
+
+const STILL_BOTTOM_FOCAL = "object-[50%_40%]";
 
 const ALT = {
   /* TODO(myo): describe what is actually in IMG_3327 — I have not seen it, so
      this is a neutral placeholder rather than an invented description. Alt text
      that guesses wrong is worse than alt text that is plainly generic. */
   stillTop: "Fortune chapter still",
-  stillBottom: "A runic sheet unrolled across the table",
+  /* TODO(myo): same — the filename suggests nawarat (the nine gems) and a
+     vajra, but I am not going to describe an image I cannot see. Two or three
+     plain words about what is in the frame is all this needs. */
+  stillBottom: "Fortune chapter still",
 } as const;
 
 /* ---------------------------------------------------------------------------
@@ -245,8 +317,55 @@ export default function FortuneHero() {
             src={MEDIA.stillBottom}
             alt={ALT.stillBottom}
             fill
-            sizes="50vw"
-            className="object-cover"
+            /* NOT plain 50vw, and this is the cost of removing the Cloudinary
+               crop — worth understanding before you touch it.
+
+               `sizes` describes the RENDERED IMAGE BOX, not the panel. Under
+               object-cover in a panel that is taller than the source, the image
+               box is far wider than the panel: it is scaled up until its height
+               covers, and the extra width is what gets clipped. On a 390px
+               phone the panel is 195 x 422; a landscape source has to be scaled
+               to roughly 630 CSS px wide before its height reaches 422. Ask for
+               50vw there (195) and the browser fetches a file a third of the
+               width it actually needs, then upscales it — a soft, mushy still
+               that looks like a compression fault.
+
+               So: 50vw from md up, where the panel is landscape and width
+               genuinely drives the request, and 150vw below it, where height
+               drives it and the image box overhangs the viewport. Overstating
+               `sizes` is the documented way to buy resolution for a cover crop;
+               it is not a hack.
+
+               WHY 150 AND NOT 200. The exact figure depends on the source's
+               aspect ratio, which I could not check — Cloudinary is not
+               reachable from here. Working from the 422px panel height on a
+               390px phone, the width the image box needs is 422 x sourceAR:
+
+                   source 4:3 (1.33) -> 563 CSS px -> 1126 @2x -> fetches w_1200
+                   source 3:2 (1.50) -> 633 CSS px -> 1266 @2x -> fetches w_1920
+                   source 16:9 (1.78) -> 751 CSS px -> 1502 @2x -> fetches w_1920
+
+               I measured both: 200vw makes the browser pick w_1920 on every
+               phone, 150vw picks w_1200. For a still that sits behind a 62%
+               black scrim in a 195x422 corner of the hero, 1920 is a lot of
+               bytes for detail nobody sees, so 150vw is the better default.
+
+               If your source is wider than 4:3 AND the still looks soft on a
+               phone, raise this to 200vw. To find out which you have, paste the
+               image URL into a browser tab and run in the console:
+               `const i=document.querySelector('img'); i.naturalWidth/i.naturalHeight`
+
+               If the extra bytes bother you more than the softness, the real
+               fix is art direction — a portrait Cloudinary crop for phones and
+               a landscape one for md+ — not shrinking this number further. */
+            sizes="(min-width: 768px) 50vw, 150vw"
+            /* object-cover + a focal point, per your brief. If you decide you
+               would rather see the WHOLE frame with no crop at all, swap
+               `object-cover` for `object-contain` here — it will letterbox
+               against the section's black, which on this dark hero reads as
+               deliberate rather than broken. The focal class becomes a no-op in
+               that mode and can stay. */
+            className={`object-cover ${STILL_BOTTOM_FOCAL}`}
           />
         </div>
       </div>
