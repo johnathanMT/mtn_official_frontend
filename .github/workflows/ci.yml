@@ -1,3 +1,23 @@
+# =============================================================================
+#  CI — mtn_official_frontend
+#  Path in the repo: .github/workflows/ci.yml
+# =============================================================================
+#
+#  Written against what is actually in your repository, not a generic template:
+#
+#    repo root      IS the Next.js app (you re-rooted it), so no working-directory
+#    package manager npm, with package-lock.json committed -> `npm ci`
+#    branch          main
+#    Node            22 (your local is v22.23.2; Next 16 requires >= 20)
+#    scripts         dev / build / start / lint    ... and NO "test" script
+#
+#  That last one matters. A bare `npm test` in this repo fails immediately with
+#  `npm error Missing script: "test"` and the whole pipeline goes red for a
+#  reason that has nothing to do with your code. The test step below checks for
+#  the script first and skips cleanly if it is absent — so this file is correct
+#  today and starts running your tests the moment you add one, with no edit.
+# =============================================================================
+
 name: CI
 
 on:
@@ -6,11 +26,15 @@ on:
   pull_request:
     branches: [main]
 
+# Least privilege: this workflow only ever reads the repository.
 permissions:
   contents: read
 
+# A second push to the same branch cancels the first run instead of queueing
+# behind it. On a personal repo that is the difference between "my fix is
+# green in 2 minutes" and "in 6".
 concurrency:
-  group: "${{ github.workflow }}-${{ github.ref }}"
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -20,25 +44,106 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      # ---------------------------------------------------------------------
+      # 1 · Checkout
+      # ---------------------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ---------------------------------------------------------------------
+      # 2 · Node
+      #
+      # `cache: npm` keys the dependency cache off package-lock.json, which you
+      # have committed. Without a lockfile this option silently does nothing.
+      # ---------------------------------------------------------------------
       - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
-     : actions/cache@v4
+      # ---------------------------------------------------------------------
+      # 3 · Dependencies
+      #
+      # `npm ci`, never `npm install`. ci installs exactly what the lockfile
+      # says and fails if package.json and the lockfile disagree — which is the
+      # behaviour you want from a build server. `npm install` would quietly
+      # resolve newer versions and rewrite the lockfile inside the runner, so a
+      # green CI would not prove the same tree builds on your machine.
+      # ---------------------------------------------------------------------
+      - name: Install dependencies
+        run: npm ci
+
+      # ---------------------------------------------------------------------
+      # 4 · Lint
+      #
+      # Your script is a bare `eslint`, which under flat config lints the whole
+      # working directory. On a fresh CI checkout that is exactly right — 34
+      # files, everything tracked and nothing else.
+      # ---------------------------------------------------------------------
+      - name: Lint
+        run: npm run lint
+
+      # ---------------------------------------------------------------------
+      # 5 · Typecheck
+      #
+      # `next typegen` FIRST, and this is not optional. Next 16 generates the
+      # global route/layout types — LayoutProps, PageProps and friends — into
+      # .next/types, and your tsconfig `include` already points at that folder.
+      # They are generated, never committed, so on a fresh runner they do not
+      # exist yet and a bare `tsc --noEmit` dies on the first layout file:
+      #
+      #     src/app/layout.tsx(134,50): error TS2304:
+      #     Cannot find name 'LayoutProps'.
+      #
+      # It passes on your machine only because your local .next is left over
+      # from `npm run dev`. I hit exactly this running the pipeline against a
+      # clean checkout. `next typegen` writes those types without doing a full
+      # build, which keeps this step fast and keeps it BEFORE the expensive one.
+      # ---------------------------------------------------------------------
+      - name: Generate route types
+        run: npx next typegen
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      # ---------------------------------------------------------------------
+      # 6 · Next.js build cache
+      #
+      # Restores .next/cache between runs. Keyed on the lockfile plus a hash of
+      # your source, so it re-uses the cache when only config changed and falls
+      # back to the most recent one otherwise.
+      # ---------------------------------------------------------------------
+      - name: Restore Next.js cache
+        uses: actions/cache@v4
         with:
           path: .next/cache
-          key: "nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**/*.{ts,tsx}', '*.ts', '*.mjs') }}"
+          key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**/*.{ts,tsx}', '*.ts', '*.mjs') }}
           restore-keys: |
             nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
 
+      # ---------------------------------------------------------------------
+      # 7 · Build
+      #
+      # No environment variables are required. NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+      # and NEXT_PUBLIC_SITE_URL both fall back to working defaults in
+      # src/config/mediaControl.ts, so this builds green with no secrets set.
+      # If you ever remove those fallbacks, add them under `env:` here.
+      #
+      # This step needs outbound internet — next/font/google fetches Playfair,
+      # Inter and Cormorant at build time. GitHub runners have it.
+      # ---------------------------------------------------------------------
       - name: Build
         run: npm run build
 
+      # ---------------------------------------------------------------------
+      # 8 · Tests — conditional, because there is no test script yet
+      #
+      # `npm pkg get scripts.test` prints the literal string `{}` when the key
+      # is missing, which is what the guard checks for. Add a "test" script to
+      # package.json and this step starts running it on the next push; until
+      # then it reports itself as skipped rather than failing the run.
+      # ---------------------------------------------------------------------
       - name: Run tests (if a test script exists)
         run: |
           if [ "$(npm pkg get scripts.test)" = "{}" ]; then
