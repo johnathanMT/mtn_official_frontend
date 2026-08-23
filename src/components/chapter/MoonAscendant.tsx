@@ -2,14 +2,24 @@
 
 /**
  * ============================================================================
- *  MOON ASCENDANT — showcase, argument, invitation
+ *  MOON ASCENDANT — showcase, argument, invitation. Bilingual.
  * ============================================================================
  *
  *  Sits below FortunePhilosophy on the same #0a0a0a field, so the two read as
  *  one continuous dark passage rather than two stacked panels.
  *
  *  ---------------------------------------------------------------------------
- *  THE ONE PLACE I DEPARTED FROM THE BRIEF: object-cover + aspect-video
+ *  THE BILINGUAL RULES
+ *  ---------------------------------------------------------------------------
+ *  Written out in full at the top of FortuneHero.tsx: lang="my" on every
+ *  Burmese node, tracking-normal always, never italic, and far more leading
+ *  than the Latin above it. The one that bites hardest in this file is the
+ *  CTA — a pill whose English label carries `tracking-[0.18em] uppercase`.
+ *  Neither belongs on Myanmar, so the Burmese line inside the button resets
+ *  both rather than inheriting them from the shared button class.
+ *
+ *  ---------------------------------------------------------------------------
+ *  THE ONE PLACE I DEPARTED FROM THE ORIGINAL BRIEF: object-cover + aspect-video
  *  ---------------------------------------------------------------------------
  *  You asked for `object-cover` inside `aspect-video`. That pairing is right
  *  for a photograph, where losing a strip of sky costs nothing. This image is
@@ -69,13 +79,58 @@ const SHOWCASE = {
    Accepting, per the header note, that it will cut the top and bottom off. */
 
 /* ---------------------------------------------------------------------------
- * COPY
+ * COPY — every string in one place, in both languages
+ *
+ * The English body is split into three parts because "Chandra Lagna" is set in
+ * its own <em lang="sa"> in the markup. Keeping the three fragments here rather
+ * than inlining the prose into the JSX means the whole page's copy is still
+ * editable from one screen.
+ *
+ * On the Burmese body, four choices worth naming so you can overrule any:
+ *
+ *   "လကား" rather than "လသည်ကား" — the contrastive particle ကား attached
+ *   directly to the subject is the literary form, and it is what carries the
+ *   English "While the Sun … the Moon …" contrast without a clumsy connective.
+ *
+ *   "ခံစားမှုဒီရေများ" for "tides of our subconscious" — ဒီရေ is the literal
+ *   sea tide, and Burmese takes the metaphor as readily as English does. The
+ *   alternative, အလှိုင်းအလွှား (waves), suggests turbulence rather than the
+ *   slow governed rise and fall the English means.
+ *
+ *   "ပုံကြမ်း" for "blueprint" — literally a draft plan. There is no Burmese
+ *   word for blueprint that is not a transliteration, and ပုံကြမ်း keeps the
+ *   sense of an underlying design that is drawn before the thing itself.
+ *
+ *   "စန်းလဂ် (Chandra Lagna)" exactly as you specified — စန်းလဂ် is the term a
+ *   Burmese astrologer would actually use, with the Sanskrit in parentheses for
+ *   readers who know it under that name.
  * ------------------------------------------------------------------------ */
 
 const COPY = {
-  label: "The Lunar Perspective",
-  heading: "Charting the Inner Cosmos",
-  cta: "Read Your Stars on Vedin",
+  label: {
+    en: "The Lunar Perspective",
+    my: "စန်းလဂ် ရှုထောင့်",
+  },
+
+  heading: {
+    en: "Charting the Inner Cosmos",
+    my: "အတွင်းစိတ်ကမ္ဘာကို ပုံဖော်ခြင်း",
+  },
+
+  body: {
+    enBefore:
+      "While the Sun dictates our outward expression, the Moon governs the hidden tides of our subconscious. In advanced astrological traditions, calculating your destiny from the Moon Ascendant—or ",
+    enTerm: "Chandra Lagna",
+    enAfter:
+      "—reveals the true emotional and psychological blueprint of your life. By mapping the celestial bodies against the exact position of the Moon at your birth, we unlock profound insights into your innate desires, emotional resilience, and the natural flow of your fortune.",
+    my: "နေသည် ကျွန်ုပ်တို့၏ ပြင်ပသို့ ထင်ဟပ်ဖော်ပြမှုကို အုပ်စိုးသော်လည်း၊ လကား စိတ်အောက်နက်ရှိုင်းရာ၌ တိတ်ဆိတ်စွာ စီးဆင်းနေသော ခံစားမှုဒီရေများကို အုပ်ချုပ်သည်။ အဆင့်မြင့် နက္ခတ်ဗေဒင်အစဉ်အလာများတွင် သင်၏ကံကြမ္မာကို စန်းလဂ် (Chandra Lagna) မှ တွက်ချက်ခြင်းသည် သင့်ဘဝ၏ စိတ်ခံစားမှုနှင့် စိတ်ပိုင်းဆိုင်ရာ ပုံကြမ်းအစစ်အမှန်ကို ဖော်ထုတ်ပြသပေးသည်။ သင်မွေးဖွားချိန်၌ လတည်ရှိရာ တိကျသောနေရာနှင့် ယှဉ်တွဲ၍ ဂြိုဟ်နက္ခတ်များကို ပုံဖော်ခြင်းဖြင့် သင်၏ မွေးရာပါဆန္ဒများ၊ စိတ်ဓာတ်ခံနိုင်ရည်နှင့် ကံကြမ္မာ၏ သဘာဝစီးဆင်းပုံတို့ကို နက်နက်ရှိုင်းရှိုင်း သိမြင်နိုင်မည် ဖြစ်သည်။",
+  },
+
+  cta: {
+    en: "Read Your Stars on Vedin",
+    my: "Vedin တွင် ကံကြမ္မာကို စစ်ဆေးပါ",
+  },
+
   ctaHref: "https://vedin.myothant.dev",
 } as const;
 
@@ -217,32 +272,66 @@ export default function MoonAscendant() {
         {...reveal(textIn)}
         className="mx-auto mt-16 max-w-3xl px-6 text-center"
       >
+        {/* ---------- LABEL ---------- */}
         <p className="font-sans text-xs tracking-[0.2em] text-gray-400 uppercase">
-          {COPY.label}
+          {COPY.label.en}
+        </p>
+        {/* 0.2em of tracking would separate the ဂ် from the လ it belongs to in
+            စန်းလဂ်, so this resets it. gray-400 rather than the brief's
+            gray-500 — measured, gray-500 on #0a0a0a is 4.09:1 and fails AA.
+            The full numbers are in FortunePhilosophy.tsx at its body copy. */}
+        <p
+          lang="my"
+          className="font-myanmar mt-2 text-[0.8125rem] leading-[1.7] tracking-normal text-gray-400"
+        >
+          {COPY.label.my}
         </p>
 
-        <h2
-          id="moon-ascendant-heading"
-          className="font-display my-6 text-4xl leading-[1.15] font-medium tracking-[-0.02em] text-balance text-white md:text-5xl"
-        >
-          {COPY.heading}
+        {/* ---------- HEADING ---------- */}
+        {/* Both languages inside the h2 — `aria-labelledby` on the section
+            points here, so the section's accessible name is the whole
+            bilingual heading rather than only its English half. */}
+        <h2 id="moon-ascendant-heading" className="my-6">
+          <span className="font-display block text-4xl leading-[1.15] font-medium tracking-[-0.02em] text-balance text-white md:text-5xl">
+            {COPY.heading.en}
+          </span>
+          {/* leading 1.5 against the English 1.15: ကမ္ဘာ stacks a subscript
+              consonant below the baseline and အ carries a mark above, so this
+              line needs vertical room the English line does not. */}
+          <span
+            lang="my"
+            className="font-myanmar mt-3 block text-xl leading-[1.5] font-normal tracking-normal text-balance text-gray-400 md:text-2xl"
+          >
+            {COPY.heading.my}
+          </span>
         </h2>
 
+        {/* ---------- BODY ---------- */}
         <p className="text-lg leading-relaxed text-pretty text-gray-300">
-          While the Sun dictates our outward expression, the Moon governs the
-          hidden tides of our subconscious. In advanced astrological traditions,
-          calculating your destiny from the Moon Ascendant—or{" "}
+          {COPY.body.enBefore}
           {/* A real <em>, not the literal asterisks from the brief. The
               transliteration is set in the script serif the rest of the site
               uses for quoted material, and lang marks it as Sanskrit so a
               screen reader does not read it with English phonetics. */}
           <em lang="sa" className="font-script text-gray-200 italic">
-            Chandra Lagna
+            {COPY.body.enTerm}
           </em>
-          —reveals the true emotional and psychological blueprint of your life.
-          By mapping the celestial bodies against the exact position of the Moon
-          at your birth, we unlock profound insights into your innate desires,
-          emotional resilience, and the natural flow of your fortune.
+          {COPY.body.enAfter}
+        </p>
+
+        {/* mt-4 and a softer grey — but gray-400, not gray-500. Same measured
+            reason as the label above and as FortunePhilosophy: 4.09:1 vs
+            7.61:1 on this section's #0a0a0a, against a 4.5:1 AA floor.
+
+            Note also that the Burmese runs at 1.95 where the English above runs
+            at leading-relaxed (1.625); on a centred column that difference is
+            the whole reason the translation reads as composed rather than
+            cramped. */}
+        <p
+          lang="my"
+          className="font-myanmar mt-4 text-[1rem] leading-[1.95] tracking-normal text-pretty text-gray-400"
+        >
+          {COPY.body.my}
         </p>
       </motion.div>
 
@@ -252,16 +341,34 @@ export default function MoonAscendant() {
           href={COPY.ctaHref}
           target="_blank"
           rel="noopener noreferrer"
-          className="group relative inline-flex items-center gap-3 rounded-full bg-white px-8 py-4 font-sans text-[0.7rem] font-semibold tracking-[0.18em] text-[#0a0a0a] uppercase transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_0_0_1px_rgba(216,180,254,0.6),0_12px_40px_-8px_rgba(147,51,234,0.7)] focus-visible:ring-2 focus-visible:ring-purple-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100"
+          /* py trimmed 4 → 3 because the label is two lines now, so the pill
+             keeps roughly the height it had with one. */
+          className="group relative inline-flex items-center gap-3 rounded-full bg-white px-8 py-3 text-[#0a0a0a] transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_0_0_1px_rgba(216,180,254,0.6),0_12px_40px_-8px_rgba(147,51,234,0.7)] focus-visible:ring-2 focus-visible:ring-purple-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100"
         >
-          {COPY.cta}
+          <span className="flex flex-col items-center">
+            <span className="font-sans text-[0.7rem] font-semibold tracking-[0.18em] uppercase">
+              {COPY.cta.en}
+            </span>
+            {/* text-black/65 rather than a grey utility: this pill is WHITE, so
+                the rule inverts — stepping the translation down in prominence
+                here means going darker-but-softer, not lighter. Measured on the
+                rendered page, black at 65% over white composites to 7.00:1,
+                comfortably over the 4.5:1 AA floor while still reading as
+                secondary next to the solid-black English above it. */}
+            <span
+              lang="my"
+              className="font-myanmar mt-1 text-[0.8125rem] leading-[1.5] font-normal tracking-normal text-black/65"
+            >
+              {COPY.cta.my}
+            </span>
+          </span>
           {/* An outbound arrow, not a chevron — this leaves the site. The
               sr-only line says the same thing to a screen reader, which cannot
               see the glyph. */}
           <svg
             viewBox="0 0 24 24"
             aria-hidden="true"
-            className="h-3.5 w-3.5 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0"
+            className="h-3.5 w-3.5 shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0"
             fill="none"
             stroke="currentColor"
             strokeWidth="2.2"

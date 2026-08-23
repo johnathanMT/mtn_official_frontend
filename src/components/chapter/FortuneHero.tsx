@@ -2,7 +2,7 @@
 
 /**
  * ============================================================================
- *  FORTUNE HERO — split-screen media wall
+ *  FORTUNE HERO — split-screen media wall, bilingual
  * ============================================================================
  *
  *  A 2x2 media grid behind a dark scrim, with the chapter title centred over
@@ -20,7 +20,40 @@
  *  keep their DOM position so the browser never re-decodes them on resize.
  *
  *  ---------------------------------------------------------------------------
- *  THE .mov PROBLEM — the one change I made to your spec
+ *  THE BILINGUAL RULES — the same four in all three Fortune components
+ *  ---------------------------------------------------------------------------
+ *  1 · lang="my" ON EVERY BURMESE NODE. Not decoration. It is what tells the
+ *      browser to reach for the Myanmar font stack, what stops a screen reader
+ *      pronouncing Burmese with English phonetics, and what lets a crawler read
+ *      the page as bilingual rather than as English with noise in it.
+ *
+ *  2 · tracking-normal, ALWAYS. globals.css puts `letter-spacing: -0.02em` on
+ *      every h1–h4, and this file's own labels carry tracking up to 0.4em.
+ *      Latin tolerates that; Myanmar does not. Burmese builds a syllable from a
+ *      base consonant plus marks that sit above, below and beside it, and
+ *      letter-spacing is inserted BETWEEN those marks — positive tracking tears
+ *      the cluster apart, negative tracking overlaps it. Every Burmese node
+ *      below resets it. `uppercase` is likewise a no-op on Myanmar, so the
+ *      Burmese labels drop it rather than inheriting it.
+ *
+ *  3 · NO ITALIC ON BURMESE. The brief suggested italicising the translation.
+ *      Myanmar Text, Padauk and Noto Sans Myanmar ship no italic face, so the
+ *      browser SYNTHESISES one by shearing the glyphs — and a sheared stacked
+ *      script reads as a rendering fault rather than as emphasis. The
+ *      translations are distinguished by colour, size and the font change
+ *      instead, which is what the request was actually after.
+ *
+ *  4 · MUCH MORE LEADING. Those stacked marks occupy real vertical space.
+ *      Latin body here runs at 1.6; the Burmese under it runs at 1.95, and the
+ *      Burmese title at 1.6 where the English title runs at 0.95. Tighten them
+ *      and the upper marks clip against the line above.
+ *
+ *  The font itself comes from `font-myanmar`, a --font-myanmar token added to
+ *  the @theme block in globals.css. It is a system stack, not a webfont — the
+ *  reasoning is written out at the token.
+ *
+ *  ---------------------------------------------------------------------------
+ *  THE .mov PROBLEM — the one change I made to your original spec
  *  ---------------------------------------------------------------------------
  *  The URL you gave ends in .mov. QuickTime is a container Chrome and Firefox
  *  will not decode, so `<video src="....mov">` is a black rectangle on most
@@ -87,14 +120,34 @@ const ALT = {
 } as const;
 
 /* ---------------------------------------------------------------------------
- * COPY
+ * COPY — every string in one place, in both languages
+ *
+ * `{ en, my }` pairs rather than two parallel objects: a translation that sits
+ * one line under its source cannot silently drift out of sync when one of them
+ * is edited, and a third language later is a third key here rather than a
+ * third object to keep aligned.
+ *
+ * Note the Myanmar digits in the kicker — ၀၄, not 04. Latin numerals dropped
+ * into an otherwise Burmese line are the small tell that a translation was
+ * machine-produced and never read by a person.
  * ------------------------------------------------------------------------ */
 
 const COPY = {
-  kicker: "— Chapter 04 —",
-  title: "Fortune",
-  blurb: "Astrology, timing and reading what the sky is doing.",
-  cta: "Discover",
+  kicker: { en: "— Chapter 04 —", my: "— အခန်း ၀၄ —" },
+
+  title: { en: "Fortune", my: "ကံကြမ္မာ" },
+
+  blurb: {
+    en: "Astrology, timing and reading what the sky is doing.",
+    my: "နက္ခတ်ဗေဒင်၊ အချိန်ကာလနှင့် ကောင်းကင်ယံ၏ လှုပ်ရှားမှုများကို ဖတ်ရှုခြင်း။",
+  },
+
+  cta: { en: "Discover", my: "လေ့လာရန်" },
+
+  /* NOTE: this still points at the gallery, which now sits below both
+     FortunePhilosophy and MoonAscendant — so the button scrolls past two whole
+     sections. Change to "#fortune-philosophy" if you would rather it land on
+     the next one. Left as you had it, since you did not ask me to move it. */
   ctaHref: "#fortune-gallery",
 } as const;
 
@@ -136,8 +189,11 @@ export default function FortuneHero() {
          ever cut off and, unlike `dvh`, it does not resize as the bar hides,
          which would make the whole hero jump mid-scroll.
 
-         min-h keeps it usable on a short laptop window in landscape. */
-      className="relative h-svh min-h-[34rem] w-full overflow-hidden bg-black"
+         min-h raised 34rem → 38rem for the bilingual build. Three Burmese
+         lines were added to this column (kicker, title, blurb) and the content
+         stack grew by ~110px at the 390px breakpoint; at the old 34rem the CTA
+         sat below the fold on a short landscape window. */
+      className="relative h-svh min-h-[38rem] w-full overflow-hidden bg-black"
     >
       {/* ================= 1 · THE MEDIA GRID ================= */}
       {/* aria-hidden: this is scenery. The heading below carries the meaning,
@@ -206,11 +262,16 @@ export default function FortuneHero() {
           (~48% and ~55% effective) and the type band sits at ~70%.
 
           Composite alpha is 1-(1-a1)(1-a2), not a1+a2 — two 35% layers give
-          58%, not 70%. Worth remembering before reaching for a third. */}
+          58%, not 70%. Worth remembering before reaching for a third.
+
+          The dark band was widened from 38–66% to 32–72% for the bilingual
+          build: the type column is taller now, and at the old stops the
+          Burmese blurb fell off the bottom of the band onto the brighter still
+          behind it. */}
       <div aria-hidden="true" className="absolute inset-0 bg-black/25" />
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.30)_0%,rgba(0,0,0,0.62)_38%,rgba(0,0,0,0.62)_66%,rgba(0,0,0,0.42)_100%)]"
+        className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.30)_0%,rgba(0,0,0,0.62)_32%,rgba(0,0,0,0.62)_72%,rgba(0,0,0,0.42)_100%)]"
       />
       {/* A soft crimson bloom, low and centred — the accent colour appearing as
           light rather than as a block of paint. */}
@@ -228,40 +289,94 @@ export default function FortuneHero() {
            sits directly under the logo on short screens. */
         className="relative z-10 flex h-full flex-col items-center justify-center px-6 pt-16 text-center lg:pt-20"
       >
-        <motion.p
-          variants={riseIn}
-          className="font-sans text-[0.7rem] font-semibold tracking-[0.4em] text-[#FDFBF7]/75 uppercase sm:text-xs"
-        >
-          {COPY.kicker}
-        </motion.p>
+        {/* ---------- KICKER ---------- */}
+        {/* ONE motion node holding both lines, per your brief: the pair rises
+            together, so the eye reads it as a single label in two languages
+            rather than as two separate arrivals. Same for the title and the
+            blurb below. */}
+        <motion.div variants={riseIn}>
+          <p className="font-sans text-[0.7rem] font-semibold tracking-[0.4em] text-[#FDFBF7]/75 uppercase sm:text-xs">
+            {COPY.kicker.en}
+          </p>
+          {/* tracking-normal and no `uppercase` — rule 2 in the header. 0.4em
+              between Burmese clusters would pull the marks off the consonants
+              they belong to. */}
+          <p
+            lang="my"
+            className="font-myanmar mt-2 text-[0.8rem] leading-[1.7] font-normal tracking-normal text-[#FDFBF7]/50 sm:text-[0.875rem]"
+          >
+            {COPY.kicker.my}
+          </p>
+        </motion.div>
 
+        {/* ---------- TITLE ---------- */}
+        {/* Both languages live INSIDE the h1, deliberately: the page should
+            have exactly one h1, and its accessible name should be the whole
+            title — "Fortune ကံကြမ္မာ" — not the English half with the Burmese
+            orphaned into a sibling <p> that announces as body text. */}
         <motion.h1
           variants={riseIn}
-          /* clamp rather than text-7xl/text-8xl: at a fixed 8xl the word runs
-             past the edge of a 320px phone. This tops out at the same size on
-             a wide screen and stays inside the viewport everywhere below it. */
-          className="font-display mt-6 text-[clamp(3.25rem,11vw,8rem)] leading-[0.95] font-medium tracking-[-0.03em] text-[#FDFBF7]"
+          className="mt-6 flex flex-col items-center"
         >
-          {COPY.title}
+          {/* clamp rather than text-7xl/text-8xl: at a fixed 8xl the word runs
+              past the edge of a 320px phone. This tops out at the same size on
+              a wide screen and stays inside the viewport everywhere below. */}
+          <span className="font-display text-[clamp(3.25rem,11vw,8rem)] leading-[0.95] font-medium tracking-[-0.03em] text-[#FDFBF7]">
+            {COPY.title.en}
+          </span>
+          {/* ~35% of the English size and leading 1.6 against the English 0.95.
+              Both numbers are Myanmar-specific: ကံကြမ္မာ carries a stacked
+              medial below the line and an upper mark above it, so at Latin
+              leading the top mark collides with the word above. */}
+          <span
+            lang="my"
+            className="font-myanmar mt-3 text-[clamp(1.35rem,4.4vw,2.75rem)] leading-[1.6] font-normal tracking-normal text-[#FDFBF7]/65"
+          >
+            {COPY.title.my}
+          </span>
         </motion.h1>
 
-        <motion.p
-          variants={riseIn}
-          className="font-script mt-6 max-w-xl text-[clamp(1.05rem,2.2vw,1.35rem)] leading-[1.6] text-pretty text-[#FDFBF7]/85 italic"
-        >
-          {COPY.blurb}
-        </motion.p>
+        {/* ---------- BLURB ---------- */}
+        <motion.div variants={riseIn} className="mt-6 max-w-xl">
+          <p className="font-script text-[clamp(1.05rem,2.2vw,1.35rem)] leading-[1.6] text-pretty text-[#FDFBF7]/85 italic">
+            {COPY.blurb.en}
+          </p>
+          {/* mt-4 and a softer opacity, per the brief — but NOT italic. Rule 3
+              in the header: there is no Myanmar italic to fall back on, so the
+              browser would shear the glyphs. */}
+          <p
+            lang="my"
+            className="font-myanmar mt-4 text-[clamp(0.9rem,1.9vw,1.05rem)] leading-[1.95] text-pretty text-[#FDFBF7]/60"
+          >
+            {COPY.blurb.my}
+          </p>
+        </motion.div>
 
+        {/* ---------- CTA ---------- */}
         <motion.div variants={riseIn} className="mt-10">
           <a
             href={COPY.ctaHref}
-            className="group relative inline-flex items-center gap-3 rounded-full border border-[#E29AA2]/45 bg-white/5 px-8 py-3.5 font-sans text-[0.7rem] font-semibold tracking-[0.22em] text-[#FDFBF7] uppercase backdrop-blur-md transition-[background-color,border-color,box-shadow,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[#E29AA2]/90 hover:bg-[#5E0B15]/45 hover:shadow-[0_0_0_1px_rgba(226,154,162,0.35),0_0_28px_rgba(94,11,21,0.65)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E29AA2]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+            /* py trimmed 3.5 → 3 because the label is two lines now, so the
+               pill keeps roughly the height it had with one. items-center
+               aligns the arrow to the centre of the two-line stack rather than
+               to the English line alone. */
+            className="group relative inline-flex items-center gap-3 rounded-full border border-[#E29AA2]/45 bg-white/5 px-8 py-3 backdrop-blur-md transition-[background-color,border-color,box-shadow,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[#E29AA2]/90 hover:bg-[#5E0B15]/45 hover:shadow-[0_0_0_1px_rgba(226,154,162,0.35),0_0_28px_rgba(94,11,21,0.65)] focus-visible:ring-2 focus-visible:ring-[#E29AA2]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:translate-y-0"
           >
-            {COPY.cta}
+            <span className="flex flex-col items-center">
+              <span className="font-sans text-[0.7rem] font-semibold tracking-[0.22em] text-[#FDFBF7] uppercase">
+                {COPY.cta.en}
+              </span>
+              <span
+                lang="my"
+                className="font-myanmar mt-1 text-[0.8rem] leading-[1.5] font-normal tracking-normal text-[#FDFBF7]/70"
+              >
+                {COPY.cta.my}
+              </span>
+            </span>
             <svg
               viewBox="0 0 24 24"
               aria-hidden="true"
-              className="h-3.5 w-3.5 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
+              className="h-3.5 w-3.5 shrink-0 text-[#FDFBF7] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"

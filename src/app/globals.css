@@ -83,13 +83,37 @@
      load, `var(--font-playfair)` resolves to nothing, the whole declaration
      becomes invalid, and headings silently drop to the inherited sans-serif
      instead of the serif stack. The inner fallback keeps them serif. */
-  --font-display: var(--font-playfair, Georgia), Georgia, "Times New Roman",
-    serif;
-  --font-sans: var(--font-inter, ui-sans-serif), ui-sans-serif, system-ui,
-    sans-serif;
+  --font-display:
+    var(--font-playfair, Georgia), Georgia, "Times New Roman", serif;
+  --font-sans:
+    var(--font-inter, ui-sans-serif), ui-sans-serif, system-ui, sans-serif;
   /* Decorative serif for the signature slogan. Same inner-fallback rule. */
-  --font-script: var(--font-cormorant, Georgia), Georgia, "Times New Roman",
-    serif;
+  --font-script:
+    var(--font-cormorant, Georgia), Georgia, "Times New Roman", serif;
+
+  /* ---------- MYANMAR / BURMESE ----------
+     A system stack, and deliberately NOT a webfont. The Fortune page now sets
+     eight blocks of Burmese; pulling Padauk or Noto Sans Myanmar down from
+     Google Fonts would add a render-blocking face to a page whose entire point
+     is the media above the fold, for text that is secondary to the English.
+     Every platform this site actually sees already ships a Myanmar Unicode
+     font:
+
+       Myanmar Text ............ Windows 8 and later
+       Myanmar MN / Sangam MN .. macOS, iOS
+       Padauk, Pyidaungsu ...... Linux, and most Myanmar-locale installs
+       Noto Sans Myanmar ....... Android, ChromeOS
+
+     Order matters — first match wins, so each platform is offered its native
+     face before the fallbacks. This is the same stack src/config/proverbs.ts
+     already uses for the word cloud. If you change one, change both.
+
+     ZAWGYI IS ABSENT AND MUST STAY ABSENT. Zawgyi is not Unicode: it maps
+     different codepoints onto the Myanmar block, so correctly-encoded text
+     renders as garbage in it. Everything on this site is real Unicode. */
+  --font-myanmar:
+    "Myanmar Text", "Myanmar MN", "Myanmar Sangam MN", Padauk, Pyidaungsu,
+    "Noto Sans Myanmar", sans-serif;
 
   /* ---------- ELEVATION ---------- */
   --shadow-soft: 0 1px 2px rgb(4 20 28 / 0.05), 0 8px 24px rgb(4 20 28 / 0.08);
@@ -97,8 +121,9 @@
   --shadow-accent: 0 10px 30px rgb(94 11 21 / 0.3);
   /* The stripe's glow. Two stacked halos: a tight bright one and a wide soft
      one, which is what reads as "emitting light" rather than "has a shadow". */
-  --shadow-electric: 0 0 0 1px rgb(95 216 255 / 0.35),
-    0 0 24px rgb(23 169 224 / 0.45), 0 0 80px rgb(23 169 224 / 0.25);
+  --shadow-electric:
+    0 0 0 1px rgb(95 216 255 / 0.35), 0 0 24px rgb(23 169 224 / 0.45),
+    0 0 80px rgb(23 169 224 / 0.25);
 
   /* ---------- MOTION ---------- */
   --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);

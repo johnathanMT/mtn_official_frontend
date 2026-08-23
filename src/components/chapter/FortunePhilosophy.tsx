@@ -2,16 +2,35 @@
 
 /**
  * ============================================================================
- *  FORTUNE PHILOSOPHY — editorial two-column
+ *  FORTUNE PHILOSOPHY — editorial two-column, bilingual
  * ============================================================================
  *
  *  Sits directly below FortuneHero. Text left, artwork right, both vertically
  *  centred; one column on phones with the artwork following the prose.
  *
  *  ---------------------------------------------------------------------------
+ *  THE BILINGUAL RULES
+ *  ---------------------------------------------------------------------------
+ *  The four rules are written out in full at the top of FortuneHero.tsx —
+ *  lang="my" on every Burmese node, tracking-normal always, never italic, and
+ *  far more leading than the Latin above it. Two of them bite particularly
+ *  hard in this file:
+ *
+ *  · The h2 below inherits `letter-spacing: -0.02em` from the h1–h4 rule in
+ *    globals.css. On the English span that is the intended optical tightening.
+ *    On the Burmese span it pulls the upper and lower marks into the consonants
+ *    they belong to, so the Burmese span resets it to tracking-normal.
+ *
+ *  · The drop cap is `first-letter:` on the ENGLISH paragraph only. Burmese has
+ *    no capital forms and its first syllable is a cluster, not a letter — a
+ *    ::first-letter float there would tear ရာ apart and leave the mark
+ *    stranded. The translation is a separate <p> with no cap, which is also why
+ *    the cap measurements below still hold: nothing about that paragraph moved.
+ *
+ *  ---------------------------------------------------------------------------
  *  THE CROP WAS IN THE URL, NOT IN THE CSS
  *  ---------------------------------------------------------------------------
- *  The previous version asked Cloudinary for `c_fill,g_auto,ar_3:4` — the image
+ *  An earlier version asked Cloudinary for `c_fill,g_auto,ar_3:4` — the image
  *  arriving at the browser had ALREADY been cut to a 3:4 portrait before any
  *  CSS ran. `object-contain` would not have rescued it; it would have
  *  letterboxed an image that was itself a crop. The transformation is gone, so
@@ -93,13 +112,42 @@ const IMAGE = {
 const TINT = "bg-fuchsia-800/40 mix-blend-color";
 
 /* ---------------------------------------------------------------------------
- * COPY
+ * COPY — every string in one place, in both languages
+ *
+ * On the Burmese body: this is a reading of your English, not a word-for-word
+ * mapping of it, because a literal one reads as machine output in Burmese.
+ * Three choices worth naming, so you can overrule any of them:
+ *
+ *   "ကောင်းကင်ယံကို မော်ကြည့်" — literally "gazed up at the vault of heaven",
+ *   for "looked to the skies". Burmese has no idiom that carries the English
+ *   sense of looking to something for answers; မော်ကြည့် is the register used
+ *   for looking upward with intent, which is the closer meaning.
+ *
+ *   "ကံစမ်းခြင်းသက်သက် မဟုတ်ပေ" for "not merely a game of chance". ပေ is the
+ *   literary negative particle — formal and slightly elevated, which suits a
+ *   philosophical line. In speech you would write မဟုတ်ဘူး; here that would
+ *   sound conversational against the English.
+ *
+ *   "ညီညွတ်ဆက်စပ်မှု" for "alignment" — a compound of ညီညွတ် (in accord) and
+ *   ဆက်စပ် (connected). The single-word ချိန်ညှိမှု means a mechanical
+ *   calibration, which is the wrong register entirely for this sentence.
  * ------------------------------------------------------------------------ */
 
 const COPY = {
-  label: "The Architecture of Fate",
-  heading: "The Geometry of Fate: Bridging Ancient Mysticism & Modern Stars",
-  body: "For centuries, humanity has sought to decode the celestial tapestry. The calculation of destiny has evolved from the profound rituals of ancient times to modern analytical methods, yet the core truth remains unchanged. Fortune is not a mere roll of the dice; it is a sacred alignment of time, space, and the hidden symbols that guide our choices.",
+  label: {
+    en: "The Architecture of Fate",
+    my: "ကံကြမ္မာ၏ တည်ဆောက်ပုံ",
+  },
+
+  heading: {
+    en: "Decoding the Patterns of Destiny",
+    my: "ကံကြမ္မာ၏ ပုံစံများကို ဖော်ထုတ်ခြင်း",
+  },
+
+  body: {
+    en: "For centuries, humanity has looked to the skies to understand the intricate patterns of our existence. The calculation of destiny has evolved from ancient celestial observations to modern analytical methods, yet the core truth remains unchanged. Fortune is not merely a game of chance; it is a profound alignment of time, space, and choices.",
+    my: "ရာစုနှစ်ပေါင်းများစွာကတည်းက လူသားတို့သည် မိမိတို့တည်ရှိမှု၏ ရှုပ်ထွေးနက်နဲသော ပုံစံများကို နားလည်သိမြင်ရန် ကောင်းကင်ယံကို မော်ကြည့်ခဲ့ကြသည်။ ကံကြမ္မာကို တွက်ချက်ခြင်းသည် ရှေးဟောင်းကောင်းကင်စောင့်ကြည့်လေ့လာမှုများမှသည် ခေတ်သစ်ခွဲခြမ်းစိတ်ဖြာနည်းစနစ်များအထိ ပြောင်းလဲတိုးတက်လာခဲ့သော်လည်း အနှစ်သာရအမှန်တရားမှာမူ မပြောင်းလဲဘဲ တည်ရှိနေဆဲဖြစ်သည်။ ကံကြမ္မာဆိုသည်မှာ ကံစမ်းခြင်းသက်သက် မဟုတ်ပေ။ ၎င်းသည် အချိန်၊ အာကာသနှင့် ရွေးချယ်ဆုံးဖြတ်မှုတို့၏ နက်နဲသိမ်မွေ့သော ညီညွတ်ဆက်စပ်မှုတစ်ရပ် ဖြစ်သည်။",
+  },
 } as const;
 
 /* ---------------------------------------------------------------------------
@@ -142,33 +190,89 @@ export default function FortunePhilosophy() {
     >
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 md:grid-cols-2 lg:gap-16">
         {/* ================= LEFT · TEXT ================= */}
+        {/* One motion node for the whole column, as before — the English and
+            its translation rise together rather than in sequence, which is
+            what makes the pair read as one unit of copy. */}
         <motion.div
           variants={reduceMotion ? undefined : textIn}
           initial={reduceMotion ? false : "hidden"}
           whileInView={reduceMotion ? undefined : "show"}
           viewport={revealViewport}
         >
+          {/* ---------- LABEL ---------- */}
           <p className="font-sans text-xs tracking-widest text-gray-400 uppercase">
-            {COPY.label}
+            {COPY.label.en}
+          </p>
+          {/* No `uppercase` and no `tracking-widest`: neither does anything
+              useful to Myanmar, and the tracking actively damages it.
+
+              gray-400, NOT the gray-500 the brief suggested. Measured against
+              this section's #0a0a0a, text-gray-500 composites to 4.09:1 — under
+              the 4.5:1 WCAG AA floor for text this size. gray-400 measures
+              7.61:1. See the note on the body paragraph below. */}
+          <p
+            lang="my"
+            className="font-myanmar mt-2 text-[0.8125rem] leading-[1.7] tracking-normal text-gray-400"
+          >
+            {COPY.label.my}
           </p>
 
-          <h2
-            id="fortune-philosophy-heading"
-            /* The heading is now 62 characters rather than 30, so the fixed
-               text-6xl it used to carry would run to five lines on desktop and
-               swamp the column. clamp tops out lower, and text-balance evens
-               the line lengths instead of leaving one orphan. */
-            className="font-display mt-6 text-[clamp(1.85rem,3.4vw,3rem)] leading-[1.15] font-medium tracking-[-0.02em] text-balance text-white"
-          >
-            {COPY.heading}
+          {/* ---------- HEADING ---------- */}
+          {/* Both languages inside the h2, so the section's accessible name —
+              which `aria-labelledby` above points at — is the full bilingual
+              heading rather than only its English half. */}
+          <h2 id="fortune-philosophy-heading" className="mt-6">
+            {/* clamp rather than a fixed text-5xl: this heading is 32
+                characters in English but 37 in Burmese, and Burmese clusters
+                are wider than Latin letters at the same size, so the two lines
+                need to be free to settle at different sizes on a phone. */}
+            <span className="font-display block text-[clamp(2rem,3.6vw,3.25rem)] leading-[1.15] font-medium tracking-[-0.02em] text-balance text-white">
+              {COPY.heading.en}
+            </span>
+            {/* leading 1.5, not 1.15. At the English leading the upper mark on
+                ကံ clips into the descender of the line above. tracking-normal
+                cancels the -0.02em the h1–h4 base rule puts on this element. */}
+            <span
+              lang="my"
+              className="font-myanmar mt-3 block text-[clamp(1.05rem,1.9vw,1.5rem)] leading-[1.5] font-normal tracking-normal text-balance text-gray-400"
+            >
+              {COPY.heading.my}
+            </span>
           </h2>
 
+          {/* ---------- BODY ---------- */}
           <p
             /* 3.6rem is the largest cap that still clears line 3 — see the
                measured numbers in the header. */
             className="mt-8 text-[1.125rem] leading-[1.75] text-pretty text-gray-300 first-letter:float-left first-letter:mr-3 first-letter:font-display first-letter:text-[3.6rem] first-letter:leading-[1] first-letter:font-medium first-letter:text-white"
           >
-            {COPY.body}
+            {COPY.body.en}
+          </p>
+
+          {/* mt-4 and a softer grey, per the brief. No drop cap and no italic —
+              see the bilingual note at the top of this file. The leading jump
+              from 1.75 to 1.95 is the single biggest thing that makes a
+              Burmese paragraph look typeset rather than dumped.
+
+              THE ONE PLACE THE BRIEF ASKED FOR SOMETHING UNREADABLE. You
+              offered gray-400 or gray-500 for the translation. On white either
+              is fine; on this section's #0a0a0a they are not equivalent —
+              I rendered the page and sampled the composited pixels:
+
+                  text-gray-500 on #0a0a0a ....... 4.09:1   FAILS AA
+                  text-gray-400 on #0a0a0a ....... 7.61:1   passes
+                  text-gray-300 on #0a0a0a ....... 11.4:1   (the English above)
+
+              4.5:1 is the AA floor for text under 24px, so gray-500 was 0.4
+              short — invisible on a good monitor in a dark room, genuinely hard
+              to read on a phone in daylight. gray-400 is still a clear step
+              down from the gray-300 English, which is what the hierarchy asked
+              for, and it is legible. */}
+          <p
+            lang="my"
+            className="font-myanmar mt-4 text-[1rem] leading-[1.95] tracking-normal text-pretty text-gray-400"
+          >
+            {COPY.body.my}
           </p>
         </motion.div>
 
