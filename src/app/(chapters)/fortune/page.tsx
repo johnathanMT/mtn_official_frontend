@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import FortuneHero from "@/components/chapter/FortuneHero";
 import FortunePhilosophy from "@/components/chapter/FortunePhilosophy";
 import MoonAscendant from "@/components/chapter/MoonAscendant";
-import { getGallery } from "@/config/mediaControl";
+import SacredVerse from "@/components/chapter/SacredVerse";
 import { getChapter } from "@/config/navigation";
 
 /* Route config lives in src/config/navigation.ts — label, blurb and cover
@@ -23,8 +23,6 @@ export const metadata: Metadata = {
 };
 
 export default function FortunePage() {
-  const photos = getGallery("fortune");
-
   return (
     <main id="main">
       <FortuneHero />
@@ -33,17 +31,12 @@ export default function FortunePage() {
 
       <MoonAscendant />
 
-      {/* ---- Gallery goes here. Scaffold only for now. ----
-             id matches the hero's Discover button target. */}
-      <section
-        id="fortune-gallery"
-        className="container-premium py-20 lg:py-28"
-      >
-        <p className="text-ink-muted max-w-md text-sm">
-          {photos.length} photo{photos.length === 1 ? "" : "s"} registered for
-          this chapter in the media control room. The gallery layout lands next.
-        </p>
-      </section>
+      {/* The scaffold that used to sit here is gone, and so is the getGallery
+          call that fed it — an unused `photos` binding would fail lint. When
+          the real gallery lands it goes BELOW this banner, with its own id;
+          SacredVerse carries `fortune-gallery` because that is the hero's
+          Discover target and it should land on something worth landing on. */}
+      <SacredVerse />
     </main>
   );
 }

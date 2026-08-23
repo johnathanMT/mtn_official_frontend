@@ -196,8 +196,26 @@ export default function MoonAscendant() {
          phone the showcase is 90% of the viewport (351px, centred at x=19.5),
          so the glow reaches x=-12.5 and x=402.5 and the page picked up 13px of
          horizontal scroll. Measured, not guessed. The blur has already faded to
-         transparent by its own edge, so clipping it costs nothing visually. */
-      className="overflow-hidden bg-[#0a0a0a] py-24 lg:py-32"
+         transparent by its own edge, so clipping it costs nothing visually.
+
+         THE BACKGROUND IS NOW A RAMP, NOT A FLAT FIELD.
+         This section used to end on a flat #0a0a0a and the SacredVerse banner
+         below it started on a photograph, so the join was a step. Measured on
+         the rendered page, the largest single-row luminance change across that
+         boundary was 0.168 — that step IS the hard cut you were seeing.
+
+         `via-[#0a0a0a]` holds the flat near-black through the top half, so
+         nothing above the showcase changes; only the last stretch warms toward
+         #1a140a. That hex is not arbitrary: it is SacredVerse's own base
+         colour, so the two sections meet on the same value. If you change one,
+         change the other — they are a pair. (Your suggested #2b2113 works too,
+         just set it in both places.)
+
+         The ramp alone does not finish the job. It gets the SECTION to the
+         right colour, but the banner below still opens with a photograph, and
+         the photo's top edge is whatever the photo is. The other half of the
+         fix is a matching top fade inside SacredVerse — see the note there. */
+      className="overflow-hidden bg-linear-to-b from-[#0a0a0a] via-[#0a0a0a] to-[#1a140a] py-24 lg:py-32"
     >
       {/* ================= 1 · THE SHOWCASE ================= */}
       {/* WHY THE HOVER SCALE IS ON THE <Link> AND NOT ON THIS NODE.

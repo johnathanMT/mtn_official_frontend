@@ -174,6 +174,25 @@ const GHOST = {
        mix-blend-screen      brighter, cooler, less tinted
        mix-blend-soft-light  subtler than luminosity, warmer */
   blend: "mix-blend-luminosity",
+
+  /* The ghost used to begin at full strength on the footer's very first row.
+     On /fortune the SacredVerse banner above now dissolves INTO #0a0000, the
+     slab's top colour — and then the photograph switched on at that exact
+     boundary, which put a soft line back where the fade had just removed one.
+     Measured at 1440px with a mid-grey stand-in photograph:
+
+         last row of the banner   rgb(10,  0,  0)
+         first row of the footer  rgb(33, 23, 23)
+
+     Small in absolute terms, but at these luminances it is a 4-5x relative
+     jump, and the eye reads relative. This eases the photograph in over the
+     first 8rem so the two sections share one continuous surface.
+
+     Explicit rgba rather than `to-transparent`, for the same reason as the
+     banner's own fades: Tailwind's `transparent` is transparent BLACK, and
+     ramping the crimson to it drags the midpoint toward black as well as
+     toward see-through. */
+  lead: "bg-[linear-gradient(to_bottom,rgba(10,0,0,1)_0%,rgba(10,0,0,0.65)_45%,rgba(10,0,0,0)_100%)]",
 } as const;
 
 /* ---------------------------------------------------------------------------
@@ -288,34 +307,61 @@ export default function PremiumFooter() {
       className={`relative isolate overflow-hidden ${SLAB} text-[#FDFBF7]`}
     >
       {isFortunePage ? (
-        /* ================= THE GHOST ================= */
-        /* One layer, no gradients. Plain `absolute inset-0` rather than a
-           negative z-index: it paints after the footer's own background and
-           before the z-10 content, which is the order we want, and it cannot
-           escape the element the way a -z- child can. */
-        <div
-          aria-hidden="true"
-          className={`pointer-events-none absolute inset-0 ${GHOST.opacity} ${GHOST.blend}`}
-        >
-          <Image
-            src={GHOST.src}
-            /* Decorative. An empty alt is the correct way to say "skip this" —
+        <>
+          {/* ================= THE GHOST =================
+              One blended layer, no gradients. A plain absolutely-positioned
+              child rather than a negative z-index: it paints after the
+              footer's own background and before the z-10 content, which is
+              the order we want, and it cannot escape the element the way a
+              -z- child can. */}
+          <div
+            aria-hidden="true"
+            /* -inset-px, NOT inset-0, and it is a bug fix rather than a nicety.
+             The footer's top edge lands on a fractional device pixel whenever
+             the content above it does not add up to whole pixels. A normal
+             layer antialiases that edge harmlessly, but a mix-blend layer
+             composited at PARTIAL coverage resolves BRIGHTER than its own
+             steady state rather than dimmer — it drew a 1px warm hairline
+             straight across the top of the footer. Measured at 1440px:
+
+                 row above the seam    rgb(10,  0,  0)
+                 the seam row          rgb(48, 38, 38)   <- the hairline
+                 rows below            rgb(33, 23, 23)   <- the ghost, settled
+
+             Deleting the <img> made the line vanish, which is what identified
+             it. Overhanging the layer by a pixel puts the partial-coverage row
+             outside the footer, where `overflow-hidden` clips it, so the first
+             row you can actually see is fully covered. */
+            className={`pointer-events-none absolute -inset-px ${GHOST.opacity} ${GHOST.blend}`}
+          >
+            <Image
+              src={GHOST.src}
+              /* Decorative. An empty alt is the correct way to say "skip this" —
                a description here would be announced before the contact
                details for no benefit. */
-            alt=""
-            fill
-            /* Full-bleed, so 100vw is honest at every breakpoint. No
+              alt=""
+              fill
+              /* Full-bleed, so 100vw is honest at every breakpoint. No
                `priority`: this is the last thing on the page and the early
                bandwidth belongs to the hero. */
-            sizes="100vw"
-            /* object-center, not object-bottom. Bottom-anchoring is what put
+              sizes="100vw"
+              /* object-center, not object-bottom. Bottom-anchoring is what put
                the brightest part of the photograph under the old bottom
                plate. With no scrims to fight, centre is simply the least
                opinionated crop, and h-full w-full spell out what `fill`
                already sets so the intent survives a future edit. */
-            className="absolute inset-0 h-full w-full object-cover object-center"
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            />
+          </div>
+
+          {/* The lead-in. Sits after the ghost in the DOM and before the z-10
+              content, so it paints over the photograph and under the type.
+              See GHOST.lead for the measurement that made it necessary. */}
+          <div
+            aria-hidden="true"
+            className={`pointer-events-none absolute inset-x-0 top-0 h-32 ${GHOST.lead}`}
           />
-        </div>
+        </>
       ) : (
         /* ================= THE ORIGINAL BLOOMS ================= */
         /* Two soft crimson radials, exactly as the footer shipped before the
