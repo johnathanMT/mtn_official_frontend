@@ -3,7 +3,7 @@
  *  MEDIA CONTROL ROOM  —  src/config/mediaControl.ts
  * ============================================================================
  *
- *  SINGLE SOURCE OF TRUTH for every image, video and reel on
+ *  SINGLE SOURCE OF TRUTH for every image, video, reel and 3D model on
  *  myothantnaing.com — now Cloudinary-aware.
  *
  *  RULE:  UI components must NEVER hardcode a media URL.
@@ -109,6 +109,21 @@ export interface ReelAsset {
   caption: string;
   provider: "cloudinary" | "local" | "instagram" | "tiktok" | "youtube";
   permalink?: string;
+}
+
+/**
+ * A GLB / GLTF on Cloudinary. Never run this through imageProps() —
+ * f_auto / q_auto / c_limit would corrupt the binary. Use cloudinaryModelUrl().
+ */
+export interface ModelAsset {
+  /** Cloudinary public ID, no extension. */
+  src: string;
+  alt: string;
+  /**
+   * Resource type the file was uploaded under. Cloudinary's Media library
+   * defaults 3D files to `image/upload` unless they were posted as raw.
+   */
+  resourceType?: "image" | "raw";
 }
 
 /** One card in the vertical accordion gallery. */
@@ -241,6 +256,29 @@ export function cloudinaryVideoUrl(
 export function cloudinaryVideoPoster(publicId: string, width = 1280): string {
   if (!CLOUDINARY_CLOUD_NAME) return "";
   return `${CLOUDINARY_BASE}/${CLOUDINARY_CLOUD_NAME}/video/upload/so_0,q_auto,c_limit,w_${width}/${publicId}.jpg`;
+}
+
+/**
+ * Delivery URL for a GLB. Image transforms are omitted on purpose — a GLB
+ * is a binary scene, not a photograph.
+ */
+export function cloudinaryModelUrl(
+  publicId: string,
+  {
+    format = "glb",
+    resourceType = "image",
+  }: { format?: "glb" | "gltf"; resourceType?: "image" | "raw" } = {},
+): string {
+  if (!CLOUDINARY_CLOUD_NAME) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn(
+        `[mediaControl] NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME is not set — cannot resolve model "${publicId}".`,
+      );
+    }
+    return "";
+  }
+
+  return `${CLOUDINARY_BASE}/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload/${publicId}.${format}`;
 }
 
 /* ---------------------------------------------------------------------------
@@ -422,6 +460,16 @@ export const MEDIA = {
       alt: "",
       priority: true,
     } satisfies ImageAsset,
+
+    /**
+     * Landing hero — stone Jizo GLB. Loaded by HeroJizo3D via useGLTF.
+     * Public ID only; the .glb extension is appended by cloudinaryModelUrl().
+     */
+    jizo: {
+      src: "v1787652792/stone_buddhist_statue_3d_model_zvzz7e",
+      alt: "Stone Buddhist statue",
+      resourceType: "image",
+    } satisfies ModelAsset,
   },
 
   /* ===================== LANDING =====================

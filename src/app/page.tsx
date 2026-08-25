@@ -5,7 +5,7 @@
  *
  *  Strict top-to-bottom order. Nothing else lives on this page.
  *
- *    1. NameHero          full-screen plate, the name over it
+ *    1. NameHero          full-screen 3D Jizo plate, the name over it
  *    2. StripeOctagon     navy stripe + octagon portrait + signature slogan
  *    3. PillarGallery     six vertical accordion cards, full width
  *    4. VideoReelStory    beige band — Hozugawa reflection + looping reel

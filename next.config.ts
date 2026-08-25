@@ -27,6 +27,18 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_API_URL:
       process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5001",
   },
+
+  /** R3F / drei ship ESM that Next should compile rather than externalise. */
+  transpilePackages: ["three", "@react-three/fiber", "@react-three/drei"],
+
+  /**
+   * The parent Desktop folder has its own package-lock from an accidental
+   * npm install. Pin Turbopack to this app so it does not walk up and ignore
+   * the frontend lockfile.
+   */
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 export default nextConfig;

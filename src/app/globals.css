@@ -115,29 +115,6 @@
     "Myanmar Text", "Myanmar MN", "Myanmar Sangam MN", Padauk, Pyidaungsu,
     "Noto Sans Myanmar", sans-serif;
 
-  /* ---------- JAPANESE / MINCHO ----------
-     Mincho is the Japanese answer to a serif: vertical stems heavier than the
-     horizontals, with small triangular finials. It is what sutras are set in,
-     and it is why the Heart Sutra overlay on the landing hero does not look
-     like a UI label.
-
-     A system stack, for the same reason as the Myanmar one above: this is
-     eight decorative characters on the landing page, and Noto Serif JP is a
-     multi-megabyte face. Every platform that matters ships a Mincho:
-
-       Hiragino Mincho ProN ... macOS, iOS
-       Yu Mincho / YuMincho ... Windows 8.1+, and macOS from Catalina
-       MS Mincho ............. older Windows
-       Noto Serif JP ......... Android, ChromeOS, most Linux
-       Songti SC ............. macOS fallback with full CJK coverage
-
-     The final `serif` matters more than usual: if none of the above resolve,
-     the browser still picks a serif with CJK coverage rather than dropping to
-     the sans-serif default and losing the calligraphic weight entirely. */
-  --font-mincho:
-    "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho", YuMincho,
-    "MS Mincho", "Noto Serif JP", "Songti SC", serif;
-
   /* ---------- ELEVATION ---------- */
   --shadow-soft: 0 1px 2px rgb(4 20 28 / 0.05), 0 8px 24px rgb(4 20 28 / 0.08);
   --shadow-lift: 0 2px 4px rgb(4 20 28 / 0.06), 0 18px 48px rgb(4 20 28 / 0.16);
