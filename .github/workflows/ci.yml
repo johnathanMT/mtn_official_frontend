@@ -48,7 +48,7 @@ jobs:
       # 1 · Checkout
       # ---------------------------------------------------------------------
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # ---------------------------------------------------------------------
       # 2 · Node
@@ -57,7 +57,7 @@ jobs:
       # have committed. Without a lockfile this option silently does nothing.
       # ---------------------------------------------------------------------
       - name: Set up Node.js 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -115,7 +115,7 @@ jobs:
       # back to the most recent one otherwise.
       # ---------------------------------------------------------------------
       - name: Restore Next.js cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .next/cache
           key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**/*.{ts,tsx}', '*.ts', '*.mjs') }}

@@ -18,6 +18,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -38,6 +39,14 @@ const SPIN_SECONDS = 0.42;
 const WHIRL_SPEED = 18;
 const TWO_PI = Math.PI * 2;
 const SLOT_BOX = "h-52 w-full max-w-54 sm:h-60";
+
+function subscribeNever() {
+  return () => {};
+}
+
+function useIsClient() {
+  return useSyncExternalStore(subscribeNever, () => true, () => false);
+}
 
 type MysticCtx = {
   enabled: boolean;
@@ -344,7 +353,6 @@ export function FooterMysticProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     return () => {
       runId.current += 1;
-      clearFlight(wrapRef.current);
     };
   }, []);
 
@@ -384,11 +392,7 @@ export function MysticFooterFrame({
 
 export function FooterMysticSlot() {
   const { enabled, reducedMotion, turns, whirl, flying, busy, wrapRef, launch } = useMystic();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useIsClient();
 
   useEffect(() => {
     if (enabled && URL) useGLTF.preload(URL);

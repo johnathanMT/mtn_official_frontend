@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Center, useGLTF } from "@react-three/drei";
@@ -31,6 +31,14 @@ const CAM_FOV = 40;
 const HALF_TAN = Math.tan((CAM_FOV / 2) * (Math.PI / 180));
 const SHAKE_GAIN = 0.014;
 const SHAKE_MAX = 0.1;
+
+function subscribeNever() {
+  return () => {};
+}
+
+function useIsClient() {
+  return useSyncExternalStore(subscribeNever, () => true, () => false);
+}
 
 type Phase = "idle" | "in" | "hold" | "out";
 
@@ -198,19 +206,6 @@ function FittedKnight({
   );
 }
 
-function AimCamera({ z }: { z: number }) {
-  const { camera } = useThree();
-
-  useLayoutEffect(() => {
-    camera.fov = CAM_FOV;
-    camera.position.set(0, 1.15, z);
-    camera.lookAt(0, 0.35, 0);
-    camera.updateProjectionMatrix();
-  }, [camera, z]);
-
-  return null;
-}
-
 function Lights({ close }: { close?: boolean }) {
   return (
     <>
@@ -268,8 +263,11 @@ function KnightCanvas({
       <Canvas
         dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-        onCreated={({ gl }) => {
+        camera={{ position: [0, 1.15, cameraZ], fov: CAM_FOV, near: 0.1, far: 80 }}
+        onCreated={({ gl, camera }) => {
           gl.setClearColor(0x000000, 0);
+          camera.lookAt(0, 0.35, 0);
+          camera.updateProjectionMatrix();
         }}
         resize={{ scroll: false }}
         style={{
@@ -279,7 +277,6 @@ function KnightCanvas({
           pointerEvents: "none",
         }}
       >
-        <AimCamera z={cameraZ} />
         <Lights close={lunge} />
         <Suspense fallback={null}>
           <FittedKnight
@@ -329,12 +326,8 @@ function ChargeOverlay({ onDone }: { onDone: () => void }) {
 export default function FortuneKnight3D() {
   const reducedMotion = useReducedMotion() ?? false;
   const { scrollY } = useScroll();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();
   const [charging, setCharging] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (!URL) return null;
 

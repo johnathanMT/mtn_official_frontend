@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Center, useGLTF } from "@react-three/drei";
 import { useReducedMotion, useScroll, type MotionValue } from "motion/react";
@@ -25,6 +25,14 @@ const TWO_PI = Math.PI * 2;
 const TURNS_ACROSS_PASS = 0.5;
 /** Hold a front-facing pose while he sits in the middle of the screen. */
 const FACE_FRONT_BAND = 0.2;
+
+function subscribeNever() {
+  return () => {};
+}
+
+function useIsClient() {
+  return useSyncExternalStore(subscribeNever, () => true, () => false);
+}
 
 function useNativeBox(scene: Object3D) {
   return useMemo(() => {
@@ -155,11 +163,7 @@ export default function ProfileZawgyi3D() {
     offset: ["start end", "end start"],
   });
   const [turns, setTurns] = useState(0);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useIsClient();
 
   if (!URL) return null;
 
