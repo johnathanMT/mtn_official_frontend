@@ -120,6 +120,11 @@ import {
   SOCIAL_LINKS,
   CONTACT_EMAIL,
 } from "@/config/navigation";
+import {
+  FooterMysticProvider,
+  FooterMysticSlot,
+  MysticFooterFrame,
+} from "@/components/layout/FooterMystic3D";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -301,11 +306,14 @@ export default function PremiumFooter() {
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
 
   return (
-    <footer
-      /* isolate confines the ghost's blend mode to this element — see header.
-         It costs nothing on the routes with no ghost. */
-      className={`relative isolate overflow-hidden ${SLAB} text-[#FDFBF7]`}
-    >
+    <FooterMysticProvider>
+      <MysticFooterFrame
+        /* isolate confines the ghost's blend mode to this element — see header.
+           It costs nothing on the routes with no ghost. Overflow is hidden
+           except while the mystic is in flight, so the figure can leave the
+           slab and still snap back into the slot. */
+        className={`${SLAB} text-[#FDFBF7]`}
+      >
       {isFortunePage ? (
         <>
           {/* ================= THE GHOST =================
@@ -495,6 +503,8 @@ export default function PremiumFooter() {
             className="mt-16 h-px w-full origin-left bg-[#FDFBF7]/20 lg:mt-20"
           />
 
+          {isFortunePage ? <FooterMysticSlot /> : null}
+
           <motion.div
             variants={riseIn}
             className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between"
@@ -538,6 +548,7 @@ export default function PremiumFooter() {
           </motion.div>
         </div>
       </motion.div>
-    </footer>
+      </MysticFooterFrame>
+    </FooterMysticProvider>
   );
 }

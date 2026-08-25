@@ -5,12 +5,8 @@
  *  NAME HERO — section 1
  * ============================================================================
  *
- *  Full-screen 3D Jizo plate with the name over it. Nothing else — no
- *  octagon, no stripe, no buttons. Those are the section below.
- *
- *  Motion: the name block fades as the section leaves. The statues themselves
- *  float and track the pointer inside HeroJizo3D. All of that is disabled
- *  under prefers-reduced-motion.
+ *  Full-screen 3D plate. The name sits as a compact overlay in the top-left
+ *  so the statues and stupa keep the centre of the frame.
  * ============================================================================
  */
 
@@ -35,28 +31,22 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 const COPY = {
   kicker: "A Journey of Discovery",
-  /* One entry per masked line. */
   name: ["Myo Thant", "Naing"],
 } as const;
 
 const stage: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.12, delayChildren: 0.25 } },
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
 };
 
 const riseIn: Variants = {
   hidden: { y: "112%" },
-  show: { y: "0%", transition: { duration: 1.1, ease: EASE } },
+  show: { y: "0%", transition: { duration: 1, ease: EASE } },
 };
 
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 18 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.9, ease: EASE } },
-};
-
-const drawRule: Variants = {
-  hidden: { scaleX: 0 },
-  show: { scaleX: 1, transition: { duration: 1.2, ease: EASE } },
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
 };
 
 export default function NameHero() {
@@ -67,39 +57,41 @@ export default function NameHero() {
     target: sectionRef,
     offset: ["start start", "end start"],
   });
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 70]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 36]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
     <section
       ref={sectionRef}
       aria-label="Myo Thant Naing"
-      className="bg-secondary relative isolate flex min-h-svh items-center overflow-hidden"
+      className="bg-secondary relative isolate min-h-svh overflow-hidden"
     >
-      {/* ---------- 3D PLATE ----------
-          pointer-events-none so the overlay type stays selectable and the
-          page keeps scrolling; HeroJizo3D listens to the window pointer. */}
       <div
         aria-hidden="true"
-        className="bg-secondary pointer-events-none absolute inset-0 -z-20"
+        className="bg-secondary pointer-events-none absolute inset-0 z-0"
       >
         <HeroJizo3D />
       </div>
 
-      {/* ---------- WASH ----------
-          Light on purpose: the canvas is already navy, and a heavy black
-          overlay would kill the blue. Just enough at the left and the seams
-          so the name and the navbar stay readable. */}
+      {/* A narrow veil only where the type sits — the rest of the canvas
+          stays open so the diorama and stupa read. */}
       <div
         aria-hidden="true"
-        className="from-secondary-950/55 absolute inset-0 -z-10 bg-linear-to-b via-transparent to-secondary-950/60"
-      />
-      <div
-        aria-hidden="true"
-        className="from-secondary-950/45 absolute inset-0 -z-10 bg-linear-to-r via-transparent to-transparent"
+        className="from-secondary-950/70 pointer-events-none absolute inset-x-0 top-0 z-10 h-48 bg-linear-to-b to-transparent md:w-[min(42%,28rem)]"
       />
 
-      {/* ---------- NAME ---------- */}
+      {/* Dissolve the navy 3D plate into the dark-grey profile band. Explicit
+          rgba stops — Tailwind `to-transparent` interpolates toward black
+          and leaves a dirty seam. Ends on #2A2A2A, the profile canvas. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-20 sm:h-24 lg:h-28"
+        style={{
+          backgroundImage:
+            "linear-gradient(to bottom, rgb(11 59 76 / 0) 0%, rgb(11 59 76 / 0.28) 32%, rgb(28 32 34 / 0.72) 64%, rgb(42 42 42 / 1) 100%)",
+        }}
+      />
+
       <motion.div
         variants={stage}
         initial="hidden"
@@ -109,18 +101,18 @@ export default function NameHero() {
             ? undefined
             : { y: contentY, opacity: contentOpacity }
         }
-        className="container-premium relative w-full py-28"
+        className="pointer-events-none absolute top-0 left-0 z-20 w-full max-w-xl pt-24 pr-6 pb-8 pl-6 sm:pt-28 lg:pt-32 lg:pl-12"
       >
-        <motion.div variants={fadeUp} className="flex items-center gap-4">
-          <span aria-hidden="true" className="bg-sand h-px w-10 shrink-0" />
-          <span className="text-sand text-[0.6rem] font-semibold tracking-[0.2em] uppercase sm:text-xs sm:tracking-[0.26em]">
+        <motion.div variants={fadeUp} className="flex items-center gap-3">
+          <span aria-hidden="true" className="bg-sand h-px w-8 shrink-0" />
+          <span className="text-sand text-[0.58rem] font-semibold tracking-[0.22em] uppercase sm:text-[0.65rem] sm:tracking-[0.28em]">
             {COPY.kicker}
           </span>
         </motion.div>
 
-        <h1 className="text-primary font-display mt-6 text-[clamp(3rem,10vw,8rem)] leading-[0.95] font-medium tracking-[-0.035em]">
+        <h1 className="text-primary font-display mt-4 text-[clamp(2.35rem,5.6vw,4.5rem)] leading-[0.95] font-medium tracking-[-0.03em]">
           {COPY.name.map((line, i) => (
-            <span key={line} className="block overflow-hidden pb-[0.07em]">
+            <span key={line} className="block overflow-hidden pb-[0.06em]">
               <motion.span
                 variants={riseIn}
                 className={`block ${i === 1 ? "text-sand italic" : ""}`}
@@ -130,12 +122,6 @@ export default function NameHero() {
             </span>
           ))}
         </h1>
-
-        <motion.div
-          variants={drawRule}
-          aria-hidden="true"
-          className="bg-primary/25 mt-10 h-px w-full max-w-lg origin-left"
-        />
       </motion.div>
     </section>
   );

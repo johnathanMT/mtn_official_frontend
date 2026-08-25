@@ -129,6 +129,9 @@
   --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
   --animate-fade-up: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-veil: veil 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-profile-reel: profile-reel 32s linear infinite;
+  --animate-slogan-breathe: slogan-breathe 4.8s ease-in-out infinite;
+  --animate-slogan-sheen: slogan-sheen 4.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 
 @keyframes fade-up {
@@ -168,6 +171,34 @@
   );
 }
 
+/* Pointy-top hexagon — profile portrait frame. */
+@utility clip-hexagon {
+  clip-path: polygon(
+    50% 0%,
+    100% 25%,
+    100% 75%,
+    50% 100%,
+    0% 75%,
+    0% 25%
+  );
+}
+
+/* Tiny extra drift on the gold wire. The 30° offset is a static rotate
+   on the wrapper — if this animation never runs, the wire still reads. */
+@keyframes hex-wire-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(6px, -5px, 0) rotate(2deg);
+  }
+}
+
+.hex-wire-drift {
+  animation: hex-wire-drift 12s ease-in-out infinite;
+}
+
 /* A highlight that sweeps along the anchor stripe. */
 @keyframes stripe-sweep {
   from {
@@ -186,6 +217,40 @@
   }
   to {
     transform: scale(1.14) translate3d(0.8%, -0.6%, 0);
+  }
+}
+
+/* Seamless vertical loop for the profile centre reel. The track is two
+   identical stacks; -50% lands on the duplicate. */
+@keyframes profile-reel {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+@keyframes slogan-breathe {
+  0%,
+  100% {
+    opacity: 0.84;
+    filter: drop-shadow(0 0 0 rgb(139 18 48 / 0));
+  }
+  50% {
+    opacity: 1;
+    filter:
+      drop-shadow(0 0 8px rgb(139 18 48 / 0.5))
+      drop-shadow(0 0 22px rgb(139 18 48 / 0.22));
+  }
+}
+
+@keyframes slogan-sheen {
+  from {
+    transform: translate3d(-130%, 0, 0) skewX(-18deg);
+  }
+  to {
+    transform: translate3d(230%, 0, 0) skewX(-18deg);
   }
 }
 

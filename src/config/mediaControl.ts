@@ -429,6 +429,19 @@ export const MEDIA = {
     } satisfies ImageAsset,
   },
 
+  /* ===================== FOOTER ===================== */
+  footer: {
+    /**
+     * Hooded mystic GLB — sits in the closing credit, then launches.
+     * Public ID only; cloudinaryModelUrl() appends .glb.
+     */
+    mystic: {
+      src: "v1787680798/retopo_hooded_mystic_figure_3d_model_uljpxa",
+      alt: "Hooded mystic figure",
+      resourceType: "image",
+    } satisfies ModelAsset,
+  },
+
   /* ===================== HERO ===================== */
   hero: {
     portrait: {
@@ -470,6 +483,16 @@ export const MEDIA = {
       alt: "Stone Buddhist statue",
       resourceType: "image",
     } satisfies ModelAsset,
+
+    /**
+     * Landing hero — golden stupa GLB, sits behind and to the right of the
+     * Jizo diorama. Public ID only; cloudinaryModelUrl() appends .glb.
+     */
+    stupa: {
+      src: "v1787667999/Retopo_golden_stupa_3d_model_wrglfb",
+      alt: "Golden stupa",
+      resourceType: "image",
+    } satisfies ModelAsset,
   },
 
   /* ===================== LANDING =====================
@@ -507,6 +530,16 @@ export const MEDIA = {
       transformations: ["c_fill,g_auto,ar_1:1"],
       priority: true,
     } satisfies ImageAsset,
+
+    /**
+     * Section 2 — Zawgyi GLB, sits under the hexagon portrait.
+     * Public ID only; cloudinaryModelUrl() appends .glb.
+     */
+    zawgyi: {
+      src: "v1787653489/Retopo_zaw_gyi_robe-clad_man_3d_model_gbwmof",
+      alt: "Zawgyi, a robe-clad figure from Burmese folklore",
+      resourceType: "image",
+    } satisfies ModelAsset,
   },
 
   /* ===================== VIDEO REEL =====================
@@ -572,6 +605,16 @@ export const MEDIA = {
       width: 1920,
       height: 1080,
     } satisfies ImageAsset,
+
+    /**
+     * Fortune chapter — knight on horseback, sits under the Destiny artwork.
+     * Public ID only; cloudinaryModelUrl() appends .glb.
+     */
+    knight: {
+      src: "v1787653209/Retopo_knight_on_horse_3d_model_qv3v1x",
+      alt: "Knight on horseback",
+      resourceType: "image",
+    } satisfies ModelAsset,
   },
 
   /* ===================== MODERN ART COLLAGE =====================

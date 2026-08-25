@@ -5,8 +5,8 @@
  *
  *  Strict top-to-bottom order. Nothing else lives on this page.
  *
- *    1. NameHero          full-screen 3D Jizo plate, the name over it
- *    2. StripeOctagon     navy stripe + octagon portrait + signature slogan
+ *    1. NameHero          full-screen 3D plate, compact name top-left
+ *    2. ProfileSection    dark grey grid, hexagon portrait
  *    3. PillarGallery     six vertical accordion cards, full width
  *    4. VideoReelStory    beige band — Hozugawa reflection + looping reel
  *    5. FullSplashReel    full-bleed rapids clip + mossy inverted pyramid
@@ -25,7 +25,7 @@
  */
 
 import NameHero from "@/components/hero/NameHero";
-import StripeOctagon from "@/components/hero/StripeOctagon";
+import ProfileSection from "@/components/sections/ProfileSection";
 import PillarGallery from "@/components/gallery/PillarGallery";
 import VideoReelStory from "@/components/story/VideoReelStory";
 import FullSplashReel from "@/components/story/FullSplashReel";
@@ -41,7 +41,7 @@ export default function Home() {
     <>
       <main id="main">
         <NameHero />
-        <StripeOctagon />
+        <ProfileSection />
         <PillarGallery />
         <VideoReelStory />
         <FullSplashReel />

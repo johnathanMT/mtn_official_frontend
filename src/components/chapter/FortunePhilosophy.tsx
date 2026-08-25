@@ -89,6 +89,7 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion, type Variants } from "motion/react";
+import FortuneKnight3D from "@/components/chapter/FortuneKnight3D";
 
 /* ---------------------------------------------------------------------------
  * MEDIA
@@ -186,7 +187,7 @@ export default function FortunePhilosophy() {
     <section
       id="fortune-philosophy"
       aria-labelledby="fortune-philosophy-heading"
-      className="bg-[#0a0a0a] px-6 py-24 md:px-12 lg:px-24 lg:py-32"
+      className="overflow-visible bg-[#0a0a0a] px-6 py-24 md:px-12 lg:px-24 lg:py-32"
     >
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 md:grid-cols-2 lg:gap-16">
         {/* ================= LEFT · TEXT ================= */}
@@ -283,6 +284,7 @@ export default function FortunePhilosophy() {
           initial={reduceMotion ? false : "hidden"}
           whileInView={reduceMotion ? undefined : "show"}
           viewport={revealViewport}
+          className="flex flex-col overflow-visible"
         >
           {/* INNER — the perpetual drift. Owns y, and nothing else.
               whileInView rather than animate so the loop stops when the
@@ -326,6 +328,10 @@ export default function FortunePhilosophy() {
               className={`pointer-events-none absolute inset-0 ${TINT}`}
             />
           </motion.div>
+
+          <div className="mt-8 flex w-full justify-end overflow-visible">
+            <FortuneKnight3D />
+          </div>
         </motion.div>
       </div>
     </section>
