@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Pre-compiled Draco WASM wrappers — never lint vendored decoder files.
+    "public/draco/**",
   ]),
 ]);
 
