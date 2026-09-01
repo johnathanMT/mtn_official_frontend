@@ -36,7 +36,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 /* ---------------------------------------------------------------------------
  * COPY
- *
+ *`
  * The three lines are stored separately so each can carry its own reveal, but
  * they are joined by explicit <br /> in the markup — the shape is deliberate
  * typography, not the accident of whatever width the container happens to be.

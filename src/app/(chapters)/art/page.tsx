@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import ChapterHero from "@/components/chapter/ChapterHero";
+import ArtLonelinessMount from "@/components/three/ArtLonelinessMount";
 import { MEDIA, getGallery } from "@/config/mediaControl";
 import { chapterEyebrow, getChapter } from "@/config/navigation";
 
-/* Route config lives in src/config/navigation.ts — label, blurb and cover
-   image all resolve from there, so this file stays almost empty.
-
-   Back-to-home and the footer are provided by src/app/(chapters)/layout.tsx. */
 const CHAPTER = getChapter("/art")!;
 
 export const metadata: Metadata = {
@@ -32,12 +29,24 @@ export default function ArtPage() {
         cover={MEDIA.chapters.art}
       />
 
-      {/* ---- Gallery goes here. Scaffold only for now. ---- */}
-      <section className="container-premium py-20 lg:py-28">
-        <p className="text-ink-muted max-w-md text-sm">
-          {photos.length} photo{photos.length === 1 ? "" : "s"} registered for
-          this chapter in the media control room. The gallery layout lands next.
-        </p>
+      {/* The verse used to live in the section below. It is now an overlay on
+          the canvas itself, so it reads as part of the place rather than as a
+          caption underneath it. */}
+      <ArtLonelinessMount />
+
+      <section className="bg-[#0d0725] px-6 py-14 sm:px-8 lg:px-12 lg:py-20">
+        <div className="mx-auto flex max-w-2xl flex-col gap-3">
+          <p className="font-sans text-[0.58rem] tracking-[0.32em] text-white/35 uppercase">
+            Click the scene to walk · W A S D to move · Shift to run · Esc to
+            leave
+          </p>
+          {photos.length > 0 ? (
+            <p className="font-sans text-[0.58rem] tracking-[0.28em] text-white/25 uppercase">
+              {photos.length} still{photos.length === 1 ? "" : "s"} wait in the
+              archive
+            </p>
+          ) : null}
+        </div>
       </section>
     </main>
   );

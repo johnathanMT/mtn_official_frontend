@@ -922,6 +922,74 @@ export const MEDIA = {
       },
     },
   ] satisfies ReelAsset[],
+
+  /* ===================== ART — LONELINESS SCENE =====================
+     The seven models ArtLonelinessScene loads.
+
+     Public IDs only — cloudinaryModelUrl() appends the .glb and picks the
+     right delivery path for the resource type. Same contract as hero.jizo and
+     hero.stupa, so swapping any of these for an optimised re-export is a
+     one-line edit here and nothing in the component changes.
+
+     `figure` is the odd one out: a local file in public/, used verbatim. The
+     space is percent-encoded HERE rather than at the call site — the file on
+     disk is literally "mtn_bike 3D.glb", and an unencoded space works in most
+     browsers and fails in some. It is also 54.6 MB, which is worth optimising
+     before this page ships. */
+  artScene: {
+    tree: {
+      src: "v1788267655/dry_tree_zoxbcq",
+      alt: "A bare dry tree standing on the shoreline",
+      resourceType: "image",
+    } satisfies ModelAsset,
+
+    mountain: {
+      src: "v1788266609/desert_mountain_qh0xit",
+      alt: "A solitary mountain far out in the desert",
+      resourceType: "image",
+    } satisfies ModelAsset,
+
+    sun: {
+      src: "v1788266632/sun_i73zyr",
+      alt: "The sun",
+      resourceType: "image",
+    } satisfies ModelAsset,
+
+    moon: {
+      src: "v1788266636/moon_vc6jto",
+      alt: "The moon",
+      resourceType: "image",
+    } satisfies ModelAsset,
+
+    cloud: {
+      src: "v1788266592/cloud_krnfec",
+      alt: "A drifting cloud",
+      resourceType: "image",
+    } satisfies ModelAsset,
+
+    kites: {
+      src: "v1788266554/kites_wvmmev",
+      alt: "Stringless kites rising over the water",
+      resourceType: "image",
+    } satisfies ModelAsset,
+
+    /**
+     * Local, from public/. The compressed build of "mtn_bike 3D.glb":
+     *
+     *     54.62 MB  1,893,542 tris  three 4096² textures (268 MB VRAM)
+     *      0.12 MB      9,446 tris  three  256² textures (1.05 MB VRAM)
+     *
+     * weld → simplify(0.5%) → resize(256) → draco. The bounding box survives
+     * to within 0.16% in height, so useGrounded() places it identically.
+     *
+     * Renamed without the space while we were at it — no percent-encoding to
+     * remember. The 54 MB original is in ../_to_delete/ ; delete it when you
+     * are happy with this one.
+     *
+     * DRACO-COMPRESSED: it needs the decoder in public/draco/ to load at all.
+     */
+    figure: "/mtn_bike-3d.glb",
+  },
 } as const;
 
 /* ---------------------------------------------------------------------------
