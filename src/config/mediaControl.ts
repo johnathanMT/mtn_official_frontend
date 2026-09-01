@@ -924,7 +924,7 @@ export const MEDIA = {
   ] satisfies ReelAsset[],
 
   /* ===================== ART — LONELINESS SCENE =====================
-     The seven models ArtLonelinessScene loads.
+     The eight models ArtLonelinessScene loads.
 
      Public IDs only — cloudinaryModelUrl() appends the .glb and picks the
      right delivery path for the resource type. Same contract as hero.jizo and
@@ -989,6 +989,12 @@ export const MEDIA = {
      * DRACO-COMPRESSED: it needs the decoder in public/draco/ to load at all.
      */
     figure: "/mtn_bike-3d.glb",
+
+    /**
+     * Local, from public/raft.glb. Grounded to a target height in the scene
+     * so native export scale cannot swamp the shoreline.
+     */
+    raft: "/raft.glb",
   },
 } as const;
 

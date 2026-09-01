@@ -37,8 +37,7 @@ export default function ArtPage() {
       <section className="bg-[#0d0725] px-6 py-14 sm:px-8 lg:px-12 lg:py-20">
         <div className="mx-auto flex max-w-2xl flex-col gap-3">
           <p className="font-sans text-[0.58rem] tracking-[0.32em] text-white/35 uppercase">
-            Click the scene to walk · W A S D to move · Shift to run · Esc to
-            leave
+            Drag to look around · scroll to zoom
           </p>
           {photos.length > 0 ? (
             <p className="font-sans text-[0.58rem] tracking-[0.28em] text-white/25 uppercase">

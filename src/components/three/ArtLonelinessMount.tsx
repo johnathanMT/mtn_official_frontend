@@ -11,7 +11,7 @@ const ArtLonelinessScene = dynamic(() => import("./ArtLonelinessScene"), {
   ssr: false,
   loading: () => (
     <div
-      className="h-[86svh] w-full bg-[#05070f]"
+      className="h-[70svh] min-h-[22rem] w-full bg-[#05070f] sm:h-[80svh] lg:h-svh"
       aria-hidden="true"
     />
   ),
@@ -23,7 +23,7 @@ export default function ArtLonelinessMount() {
       aria-label="A desert meeting a calm sea — a solitary figure at the trees"
       className="relative bg-[#05070f]"
     >
-      <ArtLonelinessScene className="h-[86svh] w-full lg:h-svh" />
+      <ArtLonelinessScene className="h-[70svh] min-h-[22rem] w-full sm:h-[80svh] lg:h-svh" />
     </section>
   );
 }
